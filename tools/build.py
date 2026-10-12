@@ -6,7 +6,7 @@ Gebruik (vanuit de hoofdmap van de repository):
 - Zonder --dir/--set worden de ruwe datasets uit data/raw.enc.json gebruikt.
 - --dir: map met <id>.json of boogiewood_<id>.json; die vervangen de bestaande datasets.
 - --set id=pad: één dataset vervangen (bijv. --set wind_knmi=/tmp/wind.json).
-De peildatum wordt automatisch op vandaag (Europe/Amsterdam) gezet.
+--peildatum zet de peildatum op vandaag (alleen bij de dagelijkse update met verse Capptions/Bouwpas-data).
 """
 import argparse, glob, json, os, re, subprocess, sys, tempfile
 from datetime import datetime
@@ -53,6 +53,7 @@ def main():
     ap.add_argument("--dir")
     ap.add_argument("--set", action="append", default=[])
     ap.add_argument("--zonder-namen", action="store_true", help="namen vervangen door rollen")
+    ap.add_argument("--peildatum", action="store_true", help="peildatum (Status per) op vandaag zetten; alleen bij de dagelijkse update")
     ap.add_argument("--stand", help="tekst voor de stand, standaard nu")
     a = ap.parse_args()
 
@@ -65,7 +66,8 @@ def main():
         k, f = s.split("=", 1)
         raw[k] = json.load(open(f))
     nu = datetime.now(ZoneInfo("Europe/Amsterdam"))
-    raw["project"][0]["peildatum"] = nu.strftime("%Y-%m-%d")
+    if a.peildatum:
+        raw["project"][0]["peildatum"] = nu.strftime("%Y-%m-%d")
 
     # zzp'ers zijn herleidbaar tot één persoon: in de app samen als groep
     calc_raw = json.loads(json.dumps(raw))
