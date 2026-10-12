@@ -29,6 +29,8 @@ padding:calc(8px + env(safe-area-inset-top)) 16px 8px;font-size:12px;color:#9aa6
 .appbar button:hover{color:#e8ecf1;border-color:#4a5866}
 #dash-root{padding:0 0 calc(32px + env(safe-area-inset-bottom))}
 body.locked #dash-root,body.locked .appbar{visibility:hidden}
+body:has(.bw-present) .appbar{display:none}
+body:has(.bw-present) #dash-root{padding:0}
 #lock{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;
 background:radial-gradient(120% 80% at 50% 0%,#0e2a4d 0%,#0b0f14 60%)}
 body.locked #lock{display:flex}

@@ -2320,6 +2320,8 @@ function showTab(name, link) {
   if (typeof GETELD !== 'undefined') GETELD = new WeakSet();
   tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
   document.querySelectorAll('#bw .bw-page').forEach((p) => { p.hidden = p.id !== name; });
+  const rootEl = document.getElementById('bw'); rootEl.dataset.tab = name;
+  if (rootEl.classList.contains('bw-present')) window.scrollTo(0, 0);
   if (link) dash.setLink(name);
   render();
 }
@@ -2690,11 +2692,28 @@ function render() {
 /* ---------------- Presentatieweergave ---------------- */
 const bwRoot = document.getElementById('bw');
 const presentBtn = document.getElementById('present-btn');
+function schaal() {
+  if (!bwRoot.classList.contains('bw-present')) { bwRoot.style.removeProperty('--pz'); return; }
+  const w = document.documentElement.clientWidth || window.innerWidth;
+  bwRoot.style.setProperty('--pz', Math.max(1, Math.min(2.6, w / 1440)).toFixed(3));
+}
+let uiTimer = null;
+function toonBediening() {
+  if (!bwRoot.classList.contains('bw-present')) return;
+  bwRoot.classList.add('bw-ui');
+  clearTimeout(uiTimer);
+  uiTimer = setTimeout(() => bwRoot.classList.remove('bw-ui'), 2500);
+}
 function setPresent(on) {
   bwRoot.classList.toggle('bw-present', on);
+  bwRoot.classList.toggle('bw-ui', on);
   presentBtn.setAttribute('aria-pressed', String(on));
+  schaal();
+  if (on) toonBediening();
   render();
 }
+window.addEventListener('resize', () => { schaal(); });
+['mousemove', 'touchstart', 'keydown'].forEach((ev) => document.addEventListener(ev, toonBediening, { passive: true }));
 /* Volledig scherm: dashboard vult het hele scherm (zonder browser- en Claude-balk), waar de omgeving dat toestaat */
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
 function volledigScherm(aan) {
@@ -2715,9 +2734,10 @@ document.addEventListener('keydown', (e) => {
   e.preventDefault();
   showTab(next.dataset.tab, true);
   next.focus();
-  document.getElementById('tabs').scrollIntoView({ behavior: 'auto', block: 'start' });
+  window.scrollTo(0, 0);
 });
 
+document.getElementById('bw').dataset.tab = (tabs.find((b) => b.getAttribute('aria-selected') === 'true') || tabs[0]).dataset.tab;
 dash.onData(render);
 
 (() => {
