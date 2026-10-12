@@ -1064,7 +1064,7 @@ window.dash = {
           <div class="bw-chips" data-for="tb-meld">
             <button class="bw-chip" data-filter="alle" aria-pressed="true">Alle</button>
             <button class="bw-chip" data-filter="Bijna-ongeval" aria-pressed="false">Bijna-ongeval</button>
-            <button class="bw-chip" data-filter="Onveilige situatie" aria-pressed="false">Onveilig</button>
+            <button class="bw-chip" data-filter="Onveilige situatie / handeling" aria-pressed="false">Onveilig</button>
             <button class="bw-chip" data-filter="Goed voorbeeld" aria-pressed="false">Goed voorbeeld</button>
           </div>
           <span class="bw-count" id="cnt-meld"></span>
@@ -1832,7 +1832,7 @@ dash.calc('kpi_veiligheid', {
     const dagen = (d) => Math.round((peil - new Date(d)) / 864e5);
     const ongevallen = meldingen.filter((m) => m.type === 'Ongeval');
     const laatsteOngeval = ongevallen.map((m) => m.datum).sort().pop() || '';
-    const onveilig = meldingen.filter((m) => m.type === 'Onveilige situatie');
+    const onveilig = meldingen.filter((m) => m.type === 'Onveilige situatie / handeling');
     const goed = meldingen.filter((m) => m.type === 'Goed voorbeeld');
     const recent = (a) => a.filter((m) => dagen(m.datum) >= 0 && dagen(m.datum) < 30).length;
     const laatsteMelding = meldingen.map((m) => m.datum).sort().pop() || '';
@@ -1910,7 +1910,7 @@ dash.calc('per_maand', {
         inspecties: ins.length,
         score: ja + nee ? Math.round(100 * ja / (ja + nee)) : null,
         directie: ins.filter((i) => i.directie_mee === 'Ja').length,
-        'Onveilige situatie': mld.filter((x) => x.type === 'Onveilige situatie').length,
+        'Onveilige situatie / handeling': mld.filter((x) => x.type === 'Onveilige situatie / handeling').length,
         'Goed voorbeeld': mld.filter((x) => x.type === 'Goed voorbeeld').length,
         Ongeval: mld.filter((x) => x.type === 'Ongeval').length,
         'Bijna-ongeval': mld.filter((x) => /bijna/i.test(x.type)).length
@@ -1936,7 +1936,7 @@ dash.calc('per_week', {
         week_start: k,
         week: 'wk ' + weeknr(k),
         inspecties: inspecties.filter((i) => maandag(i.datum) === k).length,
-        meldingen: mld.filter((m) => m.type === 'Onveilige situatie').length,
+        meldingen: mld.filter((m) => m.type === 'Onveilige situatie / handeling').length,
         goed: mld.filter((m) => m.type === 'Goed voorbeeld').length
       });
     }
@@ -2037,7 +2037,7 @@ dash.calc('meldingen_onderwerp', {
     meldingen.forEach((x) => {
       const k = x.hoofdonderwerp || 'Overig';
       const r = m.get(k) || { hoofdonderwerp: k, onveilig: 0, goed: 0 };
-      if (x.type === 'Onveilige situatie') r.onveilig += 1;
+      if (x.type === 'Onveilige situatie / handeling') r.onveilig += 1;
       if (x.type === 'Goed voorbeeld') r.goed += 1;
       m.set(k, r);
     });
@@ -2050,7 +2050,7 @@ dash.calc('meldingen_bedrijf', {
   description: 'Aantal onveilige situaties en goede voorbeelden per betrokken partij. Bedrijfsnamen zijn gelijkgetrokken (HKM = HKM Bouw, Onkruid en van Kooten = Onkruijt & Van Kooten); een melding over twee partijen telt bij beide.',
   inputs: ['meldingen'],
   fn: (meldingen) => {
-    const ALIAS = { hkm: 'HKM Bouw', 'hkm bouw': 'HKM Bouw', hamlet: 'Hamlet', desa: 'Desa', reneco: 'ReneCo', vorm: 'VORM', ctbb: 'CTBB', viatraject: 'Via Traject', gortemulder: 'Gortenmulder', 'roco kraanbediening': 'Roco Kraanbediening', 'onkruid en van kooten': 'Onkruijt & Van Kooten', 'onkruijt en van kooten': 'Onkruijt & Van Kooten' };
+    const ALIAS = { 'van meulen': 'Vermeulen', vermeulen: 'Vermeulen', scalar: 'Scalar Verticaal', hkm: 'HKM Bouw', 'hkm bouw': 'HKM Bouw', hamlet: 'Hamlet', desa: 'Desa', reneco: 'ReneCo', vorm: 'VORM', ctbb: 'CTBB', viatraject: 'Via Traject', gortemulder: 'Gortenmulder', 'roco kraanbediening': 'Roco Kraanbediening', 'onkruid en van kooten': 'Onkruijt & Van Kooten', 'onkruijt en van kooten': 'Onkruijt & Van Kooten' };
     const titel = (t) => t.replace(/\b\w/g, (c) => c.toUpperCase());
     const partijen = (s) => {
       const t = String(s || '').trim();
@@ -2061,7 +2061,7 @@ dash.calc('meldingen_bedrijf', {
     const m = new Map();
     meldingen.forEach((x) => partijen(x.bedrijf).forEach((k) => {
       const r = m.get(k) || { bedrijf: k, onveilig: 0, goed: 0 };
-      if (x.type === 'Onveilige situatie') r.onveilig += 1;
+      if (x.type === 'Onveilige situatie / handeling') r.onveilig += 1;
       if (x.type === 'Goed voorbeeld') r.goed += 1;
       m.set(k, r);
     }));
@@ -2096,7 +2096,7 @@ dash.calc('vca_toets', {
       keuring: () => { const s = Object.fromEntries(materieel_status.map((r) => [r.id, r.keuring_status])); const act = materieel.filter((m) => !/Gepland/.test(m.status)); const onb = act.filter((m) => ['Onbekend', 'Verlopen'].includes(s[m.id])).length; const verl = keuringen_status.filter((k) => k.keur_status === 'Verlopen'); const k30 = keuringen_status.filter((k) => k.keur_status === 'Verloopt').length; const n = verl.length + onb; return { gemeten: n ? n + ' verlopen' : (keuringen_status.length + act.length) + ' geldig', toelichting: (verl.length ? 'Keuring verlopen en nog op de bouw: ' + verl.map((k) => k.materieel.replace(/\.+$/, '')).join(', ') + '. ' : 'Alle stuks op de keuringslijst zijn geldig gekeurd. ') + (k30 ? k30 + ' stuks moeten binnen 30 dagen gekeurd worden. ' : '') + 'Kranen, bouwliften en hefsteigers: ' + (onb ? onb + ' zonder aantoonbare keuring.' : 'gekeurd en geldig.'), status: n ? 'Niet voldaan' : k30 ? 'Aandacht' : 'Voldoet' }; },
       onderaannemers: () => { const dp = vgdocs.filter((d) => /deelplan|VGM-plan|VGM-projectplan|Sloopveiligheidsplan/i.test(d.document) && d.partij !== 'VORM'); const ok = dp.filter((d) => ['Definitief', 'Goedgekeurd', 'Actueel', 'Ontvangen'].includes(d.status)).length; return { gemeten: ok + '/' + dp.length, toelichting: 'Deelplannen onderaannemers op orde; overige met opmerkingen of zonder akkoord.', status: ok === dp.length ? 'Voldoet' : 'Aandacht' }; },
       registratie: () => { const inc = open(/^L07$/); return { gemeten: meldingen.length + ' meldingen', toelichting: 'Meldingen op het project staan in Capptions; IF 2026 = ' + String(ifk.if).replace('.', ',') + ' over ' + nInt2(ifk.uren) + ' uur (Bouwpas).' + (inc ? ' Het incident van 12-09-2026 (schade door derden aan de bouwhekken) staat niet in Capptions; vastleggen als overig incident.' : ''), status: inc ? 'Aandacht' : 'Voldoet' }; },
-      valgevaar: () => { const n = meldingen.filter((m) => m.type === 'Onveilige situatie' && /Vloer- en dakranden/.test(m.hoofdonderwerp)).length; return { gemeten: n + ' meldingen', toelichting: 'Onveilige situaties bij vloer- en dakranden in 2026' + (open(/^R01$/) ? '; Hamlet-deelplan hanteert 3,2 m in plaats van 2,5 m.' : '; Hamlet-deelplan is aangepast naar 2,5 m.'), status: open(/^R01$/) ? 'Niet voldaan' : n ? 'Aandacht' : 'Voldoet' }; },
+      valgevaar: () => { const n = meldingen.filter((m) => m.type === 'Onveilige situatie / handeling' && /Vloer- en dakranden/.test(m.hoofdonderwerp)).length; return { gemeten: n + ' meldingen', toelichting: 'Onveilige situaties bij vloer- en dakranden in 2026' + (open(/^R01$/) ? '; Hamlet-deelplan hanteert 3,2 m in plaats van 2,5 m.' : '; Hamlet-deelplan is aangepast naar 2,5 m.'), status: open(/^R01$/) ? 'Niet voldaan' : n ? 'Aandacht' : 'Voldoet' }; },
       wetregister: () => ({ gemeten: '—', toelichting: 'Nog geen wetgevingsregister aangeleverd. De wettelijke grondslagen in dit dashboard (gelabeld [W]) kunnen als basis dienen.', status: 'Niet aantoonbaar' }),
       kranen: () => { const d = project[0].kraanmachinisten_gecontroleerd; return d ? { gemeten: 'Gecontroleerd', toelichting: 'Machinisten van de torenkranen (Roco Kraanbediening) gecontroleerd in het Register kraanmachinisten op ' + fDateC(d) + '.', status: 'Voldoet' } : { gemeten: '—', toelichting: 'Registratie kraanmachinisten niet vastgelegd; bewijs moet op de werkplek aanwezig zijn.', status: 'Niet aantoonbaar' }; }
     };
@@ -2165,7 +2165,7 @@ dash.calc('aandachtspunten', {
     vca_toets.filter((r) => r.status === 'Niet voldaan' && eis[r.id].meting !== 'keuring').forEach((r) => add('vca-' + r.id, 'Hoog', eis[r.id].vraag === '—' ? eis[r.id].wet : 'VCA ' + eis[r.id].vraag, eis[r.id].eis, r.toelichting));
     acties.filter((a) => a.status !== 'Gesloten' && a.prioriteit === 'Hoog' && !a.deadline).forEach((a) => add('act-' + a.nr, 'Hoog', 'Actie ' + a.nr, a.bevinding, 'Eigenaar: ' + (a.eigenaar || a.actiehouder || 'onbekend')));
     meldingen.filter((m) => /bijna/i.test(m.type) && dagen(m.datum) >= 0 && dagen(m.datum) <= 30).forEach((m) => add('bo-' + m.id, 'Hoog', 'Bijna-ongeval ' + m.id, (m.hoofdonderwerp || 'Bijna-ongeval') + (m.bedrijf ? ' · ' + m.bedrijf : ''), String(m.omschrijving || '').length > 140 ? String(m.omschrijving).slice(0, 140) + '…' : String(m.omschrijving || '')));
-    meldingen.filter((m) => m.type === 'Onveilige situatie' && dagen(m.datum) >= 0 && dagen(m.datum) <= 30).forEach((m) => add('mld-' + m.id, 'Middel', 'Melding ' + m.id, m.hoofdonderwerp + (m.bedrijf ? ' · ' + m.bedrijf : ''), m.omschrijving.length > 140 ? m.omschrijving.slice(0, 140) + '…' : m.omschrijving));
+    meldingen.filter((m) => m.type === 'Onveilige situatie / handeling' && dagen(m.datum) >= 0 && dagen(m.datum) <= 30).forEach((m) => add('mld-' + m.id, 'Middel', 'Melding ' + m.id, m.hoofdonderwerp + (m.bedrijf ? ' · ' + m.bedrijf : ''), m.omschrijving.length > 140 ? m.omschrijving.slice(0, 140) + '…' : m.omschrijving));
     vgdocs.filter((d) => d.status === 'Ontbreekt').forEach((d) => add('doc-' + d.id, 'Hoog', 'V&G-document', 'Ontbreekt: ' + d.document, d.partij + (d.opmerking ? ' · ' + d.opmerking : '')));
     const verl = new Map(); bp_vca.filter((r) => r.vca_status === 'Verlopen').forEach((r) => verl.set(r.werkgever, (verl.get(r.werkgever) || 0) + 1));
     [...verl.entries()].forEach(([wg, n]) => add('bpv-' + String(wg).toLowerCase().replace(/[^a-z0-9]+/g, '-'), 'Hoog', 'Bouwpas VCA', 'VCA verlopen: ' + n + (n === 1 ? ' persoon' : ' personen'), wg));
@@ -2225,7 +2225,7 @@ dash.calc('piramide', {
       { laag: 1, niveau: 'Ongeval met verzuim', aantal: kpi_if[0].lti, gekoppeld: true },
       { laag: 2, niveau: 'Ongeval zonder verzuim', aantal: ongevallen.filter((m) => m.verzuim !== 'Ja').length, gekoppeld: true },
       { laag: 3, niveau: 'Bijna-ongeval', aantal: bijna.length, gekoppeld: true },
-      { laag: 4, niveau: 'Onveilige situatie', aantal: meldingen.filter((m) => m.type === 'Onveilige situatie').length, gekoppeld: true },
+      { laag: 4, niveau: 'Onveilige situatie / handeling', aantal: meldingen.filter((m) => m.type === 'Onveilige situatie / handeling').length, gekoppeld: true },
       { laag: 5, niveau: 'Goed voorbeeld', aantal: meldingen.filter((m) => m.type === 'Goed voorbeeld').length, gekoppeld: true }
     ];
   }
@@ -2428,7 +2428,7 @@ function tip(el) {
 const visible = (el) => !!el && el.offsetParent !== null && el.clientWidth > 0;
 const BLUE = 'var(--bar)';
 /* Vaste betekenis van kleuren: oranje = onveilige situatie, groen = goed voorbeeld, rood = ongeval */
-const MELD_COL = { 'Onveilige situatie': 'var(--color-warn)', 'Goed voorbeeld': 'color-mix(in srgb, var(--color-ok) 75%, transparent)', 'Bijna-ongeval': 'color-mix(in srgb, var(--cds-chart-status-critical) 55%, var(--color-warn))', Ongeval: 'var(--cds-chart-status-critical)' };
+const MELD_COL = { 'Onveilige situatie / handeling': 'var(--color-warn)', 'Goed voorbeeld': 'color-mix(in srgb, var(--color-ok) 75%, transparent)', 'Bijna-ongeval': 'color-mix(in srgb, var(--cds-chart-status-critical) 55%, var(--color-warn))', Ongeval: 'var(--cds-chart-status-critical)' };
 
 /* ---------------- Grafieken ---------------- */
 function drawPlanning() {
@@ -2701,9 +2701,9 @@ function drawHBars(id, src, labelKey, valueKey, color) {
 
 function drawPair(id, src, labelKey, lgId) {
   const el = document.getElementById(id);
-  const kleur = { onveilig: MELD_COL['Onveilige situatie'], goed: MELD_COL['Goed voorbeeld'] };
+  const kleur = { onveilig: MELD_COL['Onveilige situatie / handeling'], goed: MELD_COL['Goed voorbeeld'] };
   const lg = document.getElementById(lgId);
-  if (!lg.childElementCount) [['onveilig', 'Onveilige situatie'], ['goed', 'Goed voorbeeld']].forEach(([k, t]) => { const s = mk('span'); const i = mk('i'); i.style.background = kleur[k]; s.append(i, document.createTextNode(t)); lg.append(s); });
+  if (!lg.childElementCount) [['onveilig', 'Onveilige situatie / handeling'], ['goed', 'Goed voorbeeld']].forEach(([k, t]) => { const s = mk('span'); const i = mk('i'); i.style.background = kleur[k]; s.append(i, document.createTextNode(t)); lg.append(s); });
   if (!visible(el)) return;
   const s = state(src);
   if (s !== 'ok') return stateBox(el, s);
@@ -2724,7 +2724,7 @@ function drawPair(id, src, labelKey, lgId) {
 
 function drawMaandMeld() {
   const el = document.getElementById('ch-maand');
-  const types = ['Goed voorbeeld', 'Onveilige situatie', 'Bijna-ongeval', 'Ongeval'];
+  const types = ['Goed voorbeeld', 'Onveilige situatie / handeling', 'Bijna-ongeval', 'Ongeval'];
   const kleur = MELD_COL;
   const lg = document.getElementById('lg-maand');
   if (!lg.childElementCount) types.slice().reverse().forEach((t) => { const s = mk('span'); const i = mk('i'); i.style.background = kleur[t]; s.append(i, document.createTextNode(t)); lg.append(s); });
@@ -2917,7 +2917,7 @@ const COLS = {
   ],
   meld: [
     { k: 'id', sec: true }, { k: 'datum', fmt: fDate, date: true },
-    { k: 'type', tone: (v) => ({ Ongeval: 'bad', 'Onveilige situatie': 'warn', 'Goed voorbeeld': 'ok' }[v] || (/bijna/i.test(v) ? 'bad' : 'mute')) },
+    { k: 'type', tone: (v) => ({ Ongeval: 'bad', 'Onveilige situatie / handeling': 'warn', 'Goed voorbeeld': 'ok' }[v] || (/bijna/i.test(v) ? 'bad' : 'mute')) },
     { k: 'hoofdonderwerp' }, { k: 'omschrijving', wrap: true }, { k: 'bedrijf', sec: true }, { k: 'actie', sec: true, wrap: true }, { k: 'door', sec: true }
   ],
   docs: [
