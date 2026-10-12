@@ -97,6 +97,13 @@ def main():
     if over:
         sys.exit("Namen gevonden in app-data: " + ", ".join(over))
 
+    # wind.json alleen vervangen als deze meting nieuwer is (GitHub Actions schrijft hem elk uur)
+    try:
+        oud = json.load(open(P("data", "wind.json")))[0]["tijd_utc"]
+    except Exception:
+        oud = ""
+    if raw["wind_knmi"][0]["tijd_utc"] > oud:
+        json.dump(raw["wind_knmi"], open(P("data", "wind.json"), "w"))
     json.dump(encrypt(R, a.code, {"updated": nu.isoformat(timespec="minutes")}), open(P("data", "app.enc.json"), "w"))
     json.dump(encrypt(raw, a.beheer, {"updated": nu.isoformat(timespec="minutes")}), open(P("data", "raw.enc.json"), "w"))
     maak_index(page, a.zonder_namen)

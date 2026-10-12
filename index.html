@@ -50,9 +50,9 @@ color:#e8ecf1;font:inherit;font-size:16px;padding:12px 14px;outline:none}
 </style>
 <script src="d3.min.js"></script>
 <script>
-window.__R = {}; window.__cbs = []; window.__ready = false;
+window.__R = {}; window.__cbs = []; window.__ready = false; window.__C = []; 
 window.dash = {
-  calc() {},
+  calc(id, o) { window.__C.push([id, o]); },
   data(id) { return window.__R[id] ? { status: 'ok', data: window.__R[id] } : { status: 'loading' }; },
   onData(cb) { window.__cbs.push(cb); if (window.__ready) { try { cb(); } catch (e) { console.error(e); } } },
   setLink() {}
@@ -3412,11 +3412,35 @@ dash.onData(render);
     const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(e.iv) }, key, b64(e.ct));
     return JSON.parse(new TextDecoder().decode(pt));
   }
-  async function haal() {
-    const r = await fetch('data/app.enc.json?t=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) throw new Error('net');
-    return r.json();
+  // Data eerst rechtstreeks uit de repository (direct na elke update), anders van de site zelf.
+  const RAW = 'https://raw.githubusercontent.com/VeiligheidsdashboardBoogiewood/boogiewood/main/';
+  async function json(pad) {
+    for (const basis of [RAW, '']) {
+      try { const r = await fetch(basis + pad + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) return await r.json(); } catch (e) {}
+    }
+    throw new Error('net');
   }
+  const haal = () => json('data/app.enc.json');
+  // Wind komt elk uur los binnen; berekeningen die ervan afhangen worden hier opnieuw gedaan.
+  function zetWind(w) {
+    const R = window.__R;
+    if (!Array.isArray(w) || !w[0] || !w[0].tijd_utc) return false;
+    const huidig = R.wind_knmi && R.wind_knmi[0] && R.wind_knmi[0].tijd_utc;
+    if (huidig && huidig >= w[0].tijd_utc) return false;
+    R.wind_knmi = w;
+    const vuil = new Set(['wind_knmi']);
+    for (let ronde = 0; ronde < 4; ronde++) {
+      let iets = false;
+      for (const [id, o] of window.__C) {
+        if (vuil.has(id) && ronde > 0) continue;
+        if (!o.inputs.some((i) => vuil.has(i)) || !o.inputs.every((i) => R[i])) continue;
+        try { R[id] = o.fn(...o.inputs.map((i) => R[i])); vuil.add(id); iets = true; } catch (x) { console.error(id, x); }
+      }
+      if (!iets) break;
+    }
+    return true;
+  }
+  async function wind() { try { return zetWind(await json('data/wind.json')); } catch (e) { return false; } }
   function stempel() {
     if (!getoond) return;
     const d = new Date(getoond);
@@ -3427,6 +3451,7 @@ dash.onData(render);
   async function toon(e) {
     const R = await ontsleutel(e, code);
     window.__R = R; window.__ready = true; getoond = e.updated; env = e;
+    await wind();
     for (const cb of window.__cbs) { try { cb(); } catch (x) { console.error(x); } }
     stempel();
   }
@@ -3439,7 +3464,8 @@ dash.onData(render);
   }
   async function check() {
     if (!code || document.hidden) return;
-    try { const e = await haal(); if (e.updated !== getoond) await toon(e); } catch (e) {}
+    try { const e = await haal(); if (e.updated !== getoond) { await toon(e); return; } } catch (e) {}
+    if (await wind()) for (const cb of window.__cbs) { try { cb(); } catch (x) { console.error(x); } }
   }
 
   $('#lkf').addEventListener('submit', async (ev) => {
