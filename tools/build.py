@@ -52,6 +52,7 @@ def main():
     ap.add_argument("--beheer", required=True, help="beheersleutel voor de ruwe data (niet delen)")
     ap.add_argument("--dir")
     ap.add_argument("--set", action="append", default=[])
+    ap.add_argument("--zonder-namen", action="store_true", help="namen vervangen door rollen")
     ap.add_argument("--stand", help="tekst voor de stand, standaard nu")
     a = ap.parse_args()
 
@@ -68,7 +69,7 @@ def main():
 
     # zzp'ers zijn herleidbaar tot één persoon: in de app samen als groep
     calc_raw = json.loads(json.dumps(raw))
-    for r in calc_raw.get("bp_vca", []):
+    for r in (calc_raw.get("bp_vca", []) if a.zonder_namen else []):
         if r.get("zzp") == "Ja":
             r["werkgever"] = "Zzp'ers"
     with tempfile.TemporaryDirectory() as t:
@@ -79,8 +80,9 @@ def main():
     page = open(P("src", "dashboard.html")).read()
     buiten = re.sub(r"dash\.calc\(\s*['\"][\w-]+['\"]", "", page)
     R = {k: v for k, v in R.items() if k not in WEG and re.search(r"""(['"`])%s\1""" % re.escape(k), buiten)}
-    R = schoon(R)
-    # controle: geen bekende namen meer
+    if a.zonder_namen:
+        R = schoon(R)
+    # controle: geen bekende namen meer (alleen bij --zonder-namen)
     tekst = json.dumps(R, ensure_ascii=False)
     namen = set()
     for ds in ("organisatie", "personeel"):
@@ -89,22 +91,23 @@ def main():
     for ds, veld in (("inspecties", "door"), ("inspecties", "gecontroleerd_door"), ("meldingen", "door"), ("toolboxen", "gegeven_door")):
         for r in raw.get(ds, []):
             if r.get(veld): namen.add(r[veld])
-    over = sorted(n for n in namen if n and n in tekst)
+    over = sorted(n for n in namen if n and n in tekst) if a.zonder_namen else []
     if over:
         sys.exit("Namen gevonden in app-data: " + ", ".join(over))
 
     json.dump(encrypt(R, a.code, {"updated": nu.isoformat(timespec="minutes")}), open(P("data", "app.enc.json"), "w"))
     json.dump(encrypt(raw, a.beheer, {"updated": nu.isoformat(timespec="minutes")}), open(P("data", "raw.enc.json"), "w"))
-    maak_index(page)
+    maak_index(page, a.zonder_namen)
     print("klaar", nu.isoformat(timespec="minutes"), len(R), "datasets")
 
 
-def maak_index(page):
+def maak_index(page, zonder_namen):
     shell = open(P("tools", "shell.html")).read()
     dash = page.replace('<link rel="stylesheet" href="dashboard.css">', "<style>" + open(P("src", "dashboard.css")).read() + "</style>")
     dash = dash.replace('<link rel="stylesheet" href="hero.css">', "<style>" + open(P("src", "hero.css")).read() + "</style>")
-    dash = dash.replace('<th data-field="naam">Naam</th>', "")
-    dash = dash.replace("org: [{ k: 'naam' }, { k: 'rol', wrap: true }", "org: [{ k: 'rol', wrap: true }")
+    if zonder_namen:
+        dash = dash.replace('<th data-field="naam">Naam</th>', "")
+        dash = dash.replace("org: [{ k: 'naam' }, { k: 'rol', wrap: true }", "org: [{ k: 'rol', wrap: true }")
     open(P("index.html"), "w").write(shell.replace("{{DASH}}", dash))
 
 

@@ -64,9 +64,9 @@ window.dash = {
   <form class="lk" id="lkf" autocomplete="off">
     <div class="tag">Projectveiligheid · W1082</div>
     <h1>Veiligheidsdashboard <span>Boogiewood</span></h1>
-    <p>Voer de toegangscode in die je van het projectteam hebt gekregen.</p>
-    <label for="code">Toegangscode</label>
-    <input id="code" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <p>Voer de pincode in die je van het projectteam hebt gekregen.</p>
+    <label for="code">Pincode</label>
+    <input id="code" type="password" inputmode="numeric" autocapitalize="off" autocorrect="off" spellcheck="false" required>
     <div class="rij"><input type="checkbox" id="onthoud" checked><label for="onthoud" style="margin:0">Onthoud op dit apparaat</label></div>
     <button id="lkb" type="submit">Openen</button>
     <div class="fout" id="fout"></div>
@@ -125,7 +125,7 @@ window.dash = {
     ev.preventDefault();
     const b = $('#lkb'); b.disabled = true; $('#fout').textContent = '';
     try { await open($('#code').value.trim(), $('#onthoud').checked); }
-    catch (e) { code = null; $('#fout').textContent = e && e.message === 'net' ? 'Geen verbinding. Probeer het later opnieuw.' : 'Onjuiste toegangscode.'; }
+    catch (e) { code = null; $('#fout').textContent = e && e.message === 'net' ? 'Geen verbinding. Probeer het later opnieuw.' : 'Onjuiste pincode.'; }
     b.disabled = false;
   });
   $('#slot').addEventListener('click', () => { schrijf(SLEUTEL, null); location.reload(); });

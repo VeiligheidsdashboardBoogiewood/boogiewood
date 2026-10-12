@@ -64,9 +64,9 @@ window.dash = {
   <form class="lk" id="lkf" autocomplete="off">
     <div class="tag">Projectveiligheid · W1082</div>
     <h1>Veiligheidsdashboard <span>Boogiewood</span></h1>
-    <p>Voer de toegangscode in die je van het projectteam hebt gekregen.</p>
-    <label for="code">Toegangscode</label>
-    <input id="code" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <p>Voer de pincode in die je van het projectteam hebt gekregen.</p>
+    <label for="code">Pincode</label>
+    <input id="code" type="password" inputmode="numeric" autocapitalize="off" autocorrect="off" spellcheck="false" required>
     <div class="rij"><input type="checkbox" id="onthoud" checked><label for="onthoud" style="margin:0">Onthoud op dit apparaat</label></div>
     <button id="lkb" type="submit">Openen</button>
     <div class="fout" id="fout"></div>
@@ -927,7 +927,7 @@ window.dash = {
         <p class="bw-note">Rollen uit het BHV-plan en het BVP. V&amp;G-coördinator uitvoeringsfase: aanstelling Arbobesluit art. 2.29, taken art. 2.31.</p>
         <div class="bw-tw short">
           <table class="bw-table" id="tb-org" data-source="organisatie" data-row-key="id">
-            <thead><tr><th data-field="rol">Rol</th><th data-field="organisatie" class="sec">Organisatie</th></tr></thead>
+            <thead><tr><th data-field="naam">Naam</th><th data-field="rol">Rol</th><th data-field="organisatie" class="sec">Organisatie</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -2937,7 +2937,7 @@ const COLS = {
       sortv: (r) => (/n\.?v\.?t/i.test(r.vg_deelplan) ? 3 : /Definitief/i.test(r.vg_deelplan) ? 2 : /opmerking|ontvangen/i.test(r.vg_deelplan) ? 0 : 1) * 1e6 - Number(r.uren_8wk || 0), num: true },
     { k: 'vca_borging', sec: true, fmt: (v) => v || '', tone: (v) => v ? 'info' : 'mute' }
   ],
-  org: [{ k: 'rol', wrap: true }, { k: 'organisatie', sec: true }]
+  org: [{ k: 'naam' }, { k: 'rol', wrap: true }, { k: 'organisatie', sec: true }]
 };
 
 const join = (rows, extra, key) => { const m = Object.fromEntries(extra.map((r) => [r[key], r])); return rows.map((r) => ({ ...r, ...(m[r[key]] || {}) })); };
@@ -3446,7 +3446,7 @@ dash.onData(render);
     ev.preventDefault();
     const b = $('#lkb'); b.disabled = true; $('#fout').textContent = '';
     try { await open($('#code').value.trim(), $('#onthoud').checked); }
-    catch (e) { code = null; $('#fout').textContent = e && e.message === 'net' ? 'Geen verbinding. Probeer het later opnieuw.' : 'Onjuiste toegangscode.'; }
+    catch (e) { code = null; $('#fout').textContent = e && e.message === 'net' ? 'Geen verbinding. Probeer het later opnieuw.' : 'Onjuiste pincode.'; }
     b.disabled = false;
   });
   $('#slot').addEventListener('click', () => { schrijf(SLEUTEL, null); location.reload(); });
