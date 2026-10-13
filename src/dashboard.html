@@ -142,10 +142,10 @@
             <b><span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="melders_30" data-row="0">—</span><small> / doel 8</small></b>
             <small class="s"><span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="melders_90" data-row="0">—</span> in 90 dagen · <span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="melders_extern_90" data-row="0">—</span> van onderaannemers</small>
           </div>
-          <div class="bw-cul-kpi" data-goto="meldingen#meldingen-maand" role="link" tabindex="0" title="Naar meldingen per maand" data-warn="kpi_meldcultuur|per10k_90|<|3" data-good="kpi_meldcultuur|per10k_90|>|2.99">
-            <span class="k">Signalen per 10.000 uur</span>
-            <b><span data-kpi data-fmt="dec1" data-source="kpi_meldcultuur" data-field="per10k_90" data-row="0">—</span><small> / doel 3</small></b>
-            <small class="s">laatste 90 dagen</small>
+          <div class="bw-cul-kpi" data-goto="meldingen#meldingen-maand" role="link" tabindex="0" title="Naar meldingen per maand" data-warn="kpi_meldcultuur|meldingen_30|<|1" data-good="kpi_meldcultuur|meldingen_30|>|0">
+            <span class="k">Meldingen deze maand</span>
+            <b><span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="meldingen_30" data-row="0">—</span><small> laatste 30 dagen</small></b>
+            <small class="s"><span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="goed_30" data-row="0">—</span> goede voorbeelden · <span data-kpi data-fmt="int" data-source="kpi_meldcultuur" data-field="signalen_90" data-row="0">—</span> in 90 dagen</small>
           </div>
           <div class="bw-cul-kpi" data-goto="meldingen#opvolging-m" role="link" tabindex="0" title="Naar van melding naar maatregel" data-warn="kpi_meldcultuur|maatregel_pct|<|1" data-good="kpi_meldcultuur|maatregel_pct|>|0.999">
             <span class="k">Opgepakt met maatregel</span>
@@ -153,7 +153,7 @@
             <small class="s"><span data-kpi data-fmt="pct" data-source="kpi_meldcultuur" data-field="afgehandeld_pct" data-row="0">—</span> afgehandeld</small>
           </div>
         </div>
-        <div class="bw-cul-cta"><i></i>Iets gezien, goed of fout? Meld het. Stoppen is goed gedaan.</div>
+        <div class="bw-cul-cta"><i></i>Iets gezien, goed of fout? Meld het.</div>
       </div>
       </div>
       <div class="bw-card" id="goed-gezien" data-goto="meldingen#meldingenlijst" data-chip="tb-meld:Goed voorbeeld" role="link" tabindex="0" title="Naar de goede voorbeelden">
@@ -925,7 +925,7 @@ dash.calc('kpi_reeks', {
 
 dash.calc('kpi_meldcultuur', {
   title: 'Meldcultuur (positieve, sturende KPI’s)',
-  description: 'Leading indicators voor het voorblad: unieke melders (30 en 90 dagen, waarvan buiten de VORM-projectorganisatie), signalen per 10.000 gewerkte uur (90 dagen, uren uit Bouwpas), aandeel meldingen met vastgelegde maatregel en afgehandeld, aandeel goede voorbeelden, complimenten in werkplekinspecties en toolboxbereik (deelnames ÷ geregistreerde arbeidskrachten). Getoetst op de statusdatum.',
+  description: 'Leading indicators voor het voorblad: unieke melders (30 en 90 dagen, waarvan buiten de VORM-projectorganisatie), aantal meldingen in de laatste 30 en 90 dagen, aandeel meldingen met vastgelegde maatregel en afgehandeld, aandeel goede voorbeelden, complimenten in werkplekinspecties en toolboxbereik (deelnames ÷ geregistreerde arbeidskrachten). Getoetst op de statusdatum.',
   inputs: ['project', 'meldingen', 'bp_uren', 'inspecties', 'opvolging', 'kpi_toolboxen', 'kpi_bezetting', 'organisatie'],
   fn: (project, meldingen, bp_uren, inspecties, opvolging, kpi_toolboxen, kpi_bezetting, organisatie) => {
     const peil = new Date(project[0].peildatum + 'T00:00:00Z');
@@ -943,6 +943,7 @@ dash.calc('kpi_meldcultuur', {
     return [{
       melders_30: uniek(m30).size, melders_90: uniek(m90).size, melders_jaar: uniek(meldingen).size,
       melders_extern_90: [...uniek(m90)].filter((n) => !vorm.has(n)).length,
+      meldingen_30: m30.length, goed_30: m30.filter((m) => m.type === 'Goed voorbeeld').length,
       signalen_90: m90.length, uren_90: uren90, per10k_90: uren90 ? Math.round(m90.length / uren90 * 1e5) / 10 : null,
       per10k_jaar: urenJaar ? Math.round(meldingen.length / urenJaar * 1e5) / 10 : null,
       maatregel_pct: op['Maatregel vastgelegd'] ? op['Maatregel vastgelegd'].aandeel : null,
@@ -973,7 +974,7 @@ dash.calc('leidend_overzicht', {
     const st = (ok, bijna) => ok ? 'Op koers' : bijna ? 'Aandacht' : 'Onder doel';
     return [
       { id: 'L1', kpi: 'Melders deze maand', definitie: 'Unieke personen met minstens één melding (onveilig, bijna-ongeval of goed voorbeeld) in de laatste 30 dagen.', bron: 'Capptions', doel: '≥ 8 per maand', stand: m.melders_30 + ' (90 dagen: ' + m.melders_90 + ', onderaannemers: ' + m.melders_extern_90 + ')', status: st(m.melders_30 >= 8, m.melders_30 >= 5) },
-      { id: 'L2', kpi: 'Signalen per 10.000 uur', definitie: 'Meldingen (onveilig, bijna-ongeval, goed voorbeeld) ÷ gewerkte uren × 10.000, laatste 90 dagen.', bron: 'Capptions + Bouwpas', doel: '≥ 3 per 10.000 uur', stand: String(m.per10k_90).replace('.', ',') + ' (2026: ' + String(m.per10k_jaar).replace('.', ',') + ')', status: st(m.per10k_90 >= 3, m.per10k_90 >= 2) },
+      { id: 'L2', kpi: 'Meldingen deze maand', definitie: 'Aantal meldingen (onveilig, bijna-ongeval, goed voorbeeld) in de laatste 30 dagen; daarnaast de laatste 90 dagen.', bron: 'Capptions', doel: 'elke maand meldingen', stand: m.meldingen_30 + ' (waarvan ' + m.goed_30 + ' goed voorbeeld · 90 dagen: ' + m.signalen_90 + ')', status: st(m.meldingen_30 >= 1, false) },
       { id: 'L3', kpi: 'Opgepakt met maatregel', definitie: 'Aandeel onveilige situaties en ongevallen met een vastgelegde maatregel; daarnaast aandeel afgehandeld.', bron: 'Capptions', doel: '100% van de onveilige meldingen', stand: pc(m.maatregel_pct) + ' (afgehandeld ' + pc(m.afgehandeld_pct) + ')', status: st(m.maatregel_pct >= 1, m.maatregel_pct >= 0.9) },
       { id: 'L5', kpi: 'Goede voorbeelden', definitie: 'Aandeel goede voorbeelden in alle meldingen.', bron: 'Capptions', doel: '30–60%', stand: pc(m.goed_aandeel) + ' (' + m.goed_n + ')', status: st(m.goed_aandeel >= 0.3 && m.goed_aandeel <= 0.6, m.goed_aandeel >= 0.2) },
       { id: 'L6', kpi: 'Complimenten in inspecties', definitie: 'Werkplekinspecties waarin een compliment is gegeven; streven naar 3 complimenten op 1 correctie.', bron: 'Capptions 2a', doel: 'in elke werkplekinspectie', stand: m.compliment_ja + ' van ' + m.compliment_beoordeeld + ' (' + pc(m.compliment_pct) + ')', status: st(m.compliment_pct >= 1, m.compliment_pct >= 0.75) },

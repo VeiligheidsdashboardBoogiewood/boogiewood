@@ -595,3 +595,70 @@
 .bw.bw-present.bw-ui .bw-tabs { opacity: 1; pointer-events: auto; }
 .bw.bw-present.bw-ui { cursor: auto; }
 .bw.bw-present:not(.bw-ui) { cursor: none; }
+
+/* ================= v2 polish – rustiger, strakker, beter leesbaar ================= */
+.bw { --r-card: 14px; --r-tile: 12px; --gap: 16px;
+  --hairline: color-mix(in srgb, var(--color-border-line) 75%, transparent);
+  --surface: linear-gradient(180deg, color-mix(in srgb, var(--color-panel) 100%, #ffffff 2.5%) 0%, var(--color-panel) 60%);
+  --lift: 0 1px 0 color-mix(in srgb, #ffffff 4%, transparent) inset, 0 10px 28px -18px rgba(0,0,0,.55);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; line-height: 1.5; }
+
+/* ritme */
+.bw-grid { gap: var(--gap); margin-top: var(--gap); }
+.bw-tiles { gap: var(--gap); }
+
+/* kaarten */
+.bw .bw-card { border-radius: var(--r-card); border-color: var(--hairline); background: var(--surface); box-shadow: var(--lift); padding: 20px 22px; transition: border-color .2s; }
+.bw .bw-card:hover { border-color: color-mix(in srgb, var(--vorm-2) 22%, var(--color-border-line)); }
+.bw .bw-card h3 { font-size: 15.5px; font-weight: 600; letter-spacing: -.005em; color: var(--color-fg); }
+.bw .bw-note { font-size: 12.5px; line-height: 1.55; margin: 4px 0 16px; max-width: 72ch; color: color-mix(in srgb, var(--color-fg-muted) 92%, var(--color-fg)); }
+
+/* KPI-tegels */
+.bw .bw-tile { border-radius: var(--r-tile); border-color: var(--hairline); background: var(--surface); box-shadow: var(--lift); padding: 18px 20px 16px; transition: transform .2s var(--cds-ease-out), border-color .2s; }
+.bw .bw-tile:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--vorm-2) 25%, var(--color-border-line)); }
+.bw .bw-tile::before { width: 3px; inset: 14px auto 14px 0; border-radius: 0 3px 3px 0; }
+.bw .bw-lbl { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--color-fg-muted); }
+.bw .bw-val { font-weight: 300; letter-spacing: -.025em; }
+.bw .bw-sub { font-size: 12px; }
+
+/* sectiekoppen */
+.bw .bw-h2 { font-weight: 600; font-size: clamp(1.1rem, 1.5vw, 1.32rem); letter-spacing: -.01em; color: var(--color-fg); margin: 40px 0 4px; padding-bottom: 12px; border-bottom: 1px solid var(--hairline); align-items: center; }
+.bw .bw-h2::before { width: 4px; height: 18px; background: linear-gradient(180deg, var(--vorm-2), #1f6fc0); clip-path: none; border-radius: 2px; }
+.bw .bw-page > .bw-h2:first-child { margin-top: 8px; }
+
+/* tabbalk */
+.bw .bw-tabs { padding: 5px; gap: 2px; border-color: var(--hairline); box-shadow: 0 8px 24px -16px rgba(0,0,0,.7); }
+.bw .bw-tab { font-weight: 500; font-size: 13.5px; padding: 8px 15px; }
+.bw .bw-tab[aria-selected="true"] { background: linear-gradient(180deg, #0a5aa8, #00427f); box-shadow: 0 1px 0 rgba(255,255,255,.14) inset, 0 4px 12px -4px rgba(0,90,180,.6); }
+
+/* tabellen */
+.bw .bw-table { font-size: 12.75px; }
+.bw .bw-table th { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; padding: 10px 12px; border-bottom-color: var(--hairline); }
+.bw .bw-table td { padding: 10px 12px; border-bottom-color: color-mix(in srgb, var(--color-border-line) 55%, transparent); line-height: 1.45; }
+.bw .bw-table tbody tr:last-child td { border-bottom: 0; }
+.bw .bw-table tbody tr:nth-child(even) td { background: color-mix(in srgb, #ffffff 1.6%, transparent); }
+.bw .bw-table tbody tr:hover td { background: var(--soft); }
+.bw .bw-table td:first-child, .bw .bw-table th:first-child { padding-left: 14px; }
+.bw .bw-table td time, .bw .bw-table td.nw { white-space: nowrap; }
+#meldingen .bw-table td:last-child { white-space: nowrap; }
+
+/* badges en chips */
+.bw .bw-badge { font-weight: 600; font-size: 10.75px; letter-spacing: .01em; padding: 3px 9px; }
+.bw .bw-src { font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 3px 9px; border: 1px solid color-mix(in srgb, var(--vorm-2) 25%, transparent); }
+.bw .bw-chip { font-weight: 500; transition: background .15s, color .15s, border-color .15s; }
+.bw .bw-chip:hover { color: var(--color-fg); border-color: color-mix(in srgb, var(--vorm-2) 40%, var(--color-border-line)); }
+.bw .bw-search { border-color: var(--hairline); padding: 9px 14px; transition: border-color .15s, box-shadow .15s; }
+.bw .bw-search:focus { outline: none; border-color: var(--vorm-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--vorm-2) 20%, transparent); }
+
+/* focus zichtbaar voor toetsenbord */
+.bw :is(button, a, [tabindex]):focus-visible { outline: 2px solid var(--vorm-2); outline-offset: 2px; border-radius: 6px; }
+
+/* minder beweging als gebruiker dat wil */
+@media (prefers-reduced-motion: reduce) { .bw *, .bw *::before, .bw *::after { transition: none !important; animation: none !important; } }
+
+/* mobiel */
+@container bw (max-width: 640px) {
+  .bw .bw-card { padding: 16px; border-radius: 12px; }
+  .bw .bw-h2 { margin-top: 30px; }
+  .bw .bw-table td, .bw .bw-table th { padding: 9px 8px; }
+}
