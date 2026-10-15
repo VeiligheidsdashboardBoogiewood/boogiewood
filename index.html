@@ -2262,7 +2262,8 @@ dash.calc('aandachtspunten', {
     if (kv.length) add('keur-verlopen', 'Hoog', 'Keuring', 'Keuring verlopen (' + kv.length + ')', kv.map((k) => k.materieel.replace(/\.+$/, '') + ' (vóór ' + nlDatum(k.volgende) + ')').join('; ') + '. Keuren of van de bouw halen.');
     const k30 = keuringen_status.filter((k) => k.keur_status === 'Verloopt');
     if (k30.length) add('keur-30', 'Middel', 'Keuring', 'Keuring binnen 30 dagen (' + k30.length + ')', [...new Set(k30.map((k) => k.materieel.replace(/\.+$/, '') + ' vóór ' + nlDatum(k.volgende)))].map((t) => { const n = k30.filter((k) => k.materieel.replace(/\.+$/, '') + ' vóór ' + nlDatum(k.volgende) === t).length; return (n > 1 ? n + '× ' : '') + t; }).join('; '));
-    return uit.sort((a, b) => (a.prioriteit === 'Hoog' ? 0 : 1) - (b.prioriteit === 'Hoog' ? 0 : 1));
+    const afgehandeld = new Set(project[0].aandacht_afgehandeld || []);
+    return uit.filter((a) => !afgehandeld.has(a.id)).sort((a, b) => (a.prioriteit === 'Hoog' ? 0 : 1) - (b.prioriteit === 'Hoog' ? 0 : 1));
   }
 });
 
