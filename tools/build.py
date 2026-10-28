@@ -22,7 +22,7 @@ NAMEN = [
     (r"\s*\(Ciske / Ate van Geest\)", ""), (r"Ciske / Ate van Geest", "Hamlet"), (r"Ate van Geest", "Hamlet"), (r"\bCiske\b", "Hamlet"),
     (r"Onno van ['’]t [Ww]out", "QHSE"),
     (r"Joey Twigt", "Projectveiligheidskundige"), (r"Maikel Meeuwissen", "Projectleider realisatie"),
-    (r"Jason Daum", "Uitvoerder (plv. Hoofd BHV)"), (r"Jeroen Traa", "Uitvoerder"), (r"Koen van Heugten", "Bouwplaatscoördinator"),
+    (r"Jason Daum", "Uitvoerder (BHV)"), (r"Jeroen Traa", "Uitvoerder"), (r"Koen van Heugten", "Bouwplaatscoördinator"),
     (r"Bas Timmers", "Coördinator omgevingsveiligheid"), (r"Martijn Otterspeer", "Projectleider voorbereiding"),
     (r"Anne Ippel", "Projectmanager realisatie"),
     # losse voornamen in vrije tekst
