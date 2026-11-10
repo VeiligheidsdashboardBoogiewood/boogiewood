@@ -72,7 +72,7 @@
   </header>
 
   <nav class="bw-tabs" role="tablist" id="tabs">
-    <button class="bw-tab" role="tab" data-tab="werklijst" aria-selected="true">Werklijst <span class="n" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_urgent" data-row="0">—</span></button>
+    <button class="bw-tab" role="tab" data-tab="werklijst" aria-selected="true">Werklijst <span class="n" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="urgent" data-row="0">—</span></button>
     <button class="bw-tab" role="tab" data-tab="overzicht" aria-selected="false">Overzicht</button>
     <button class="bw-tab" role="tab" data-tab="inspecties" aria-selected="false">Inspecties</button>
     <button class="bw-tab" role="tab" data-tab="meldingen" aria-selected="false">Meldingen</button>
@@ -88,32 +88,35 @@
 
   <!-- ================= WERKLIJST ================= -->
   <section class="bw-page" id="werklijst" role="tabpanel">
-    <h2 class="bw-h2">Werklijst projectveiligheidskundige <small>wat moet ik doen, wat bewaak ik bij anderen</small></h2>
+    <h2 class="bw-h2">Werklijst projectteam <small>alle open actiepunten op urgentie · wie doet wat en wanneer</small></h2>
     <div class="bw-tiles six">
-      <div class="bw-tile hero" data-alert="kpi_werklijst|mij_laat|>|0"><div class="bw-lbl">Bij mij te laat</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_laat" data-row="0">—</div><div class="bw-sub">deadline verstreken</div></div>
-      <div class="bw-tile" data-alert="kpi_werklijst|mij_hoog|>|0"><div class="bw-lbl">Bij mij hoog</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_hoog" data-row="0">—</div><div class="bw-sub">hoge prioriteit open</div></div>
-      <div class="bw-tile" data-warn="kpi_werklijst|mij_week|>|0"><div class="bw-lbl">Bij mij deze week</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_week" data-row="0">—</div><div class="bw-sub">deadline binnen 7 dagen</div></div>
-      <div class="bw-tile"><div class="bw-lbl">Bij mij totaal</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_open" data-row="0">—</div><div class="bw-sub">open acties</div></div>
-      <div class="bw-tile" data-alert="kpi_werklijst|anderen_laat|>|0"><div class="bw-lbl">Bij anderen te laat</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="anderen_laat" data-row="0">—</div><div class="bw-sub">navragen</div></div>
-      <div class="bw-tile"><div class="bw-lbl">Bij anderen totaal</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="anderen_open" data-row="0">—</div><div class="bw-sub">bewaken</div></div>
+      <div class="bw-tile hero" data-alert="kpi_werklijst|te_laat|>|0" data-good="kpi_werklijst|te_laat|=|0"><div class="bw-lbl">Te laat</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="te_laat" data-row="0">—</div><div class="bw-sub">deadline verstreken</div></div>
+      <div class="bw-tile" data-warn="kpi_werklijst|deze_week|>|0"><div class="bw-lbl">Deze week</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="deze_week" data-row="0">—</div><div class="bw-sub">deadline binnen 7 dagen</div></div>
+      <div class="bw-tile" data-alert="kpi_werklijst|hoog|>|0"><div class="bw-lbl">Hoge prioriteit</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="hoog" data-row="0">—</div><div class="bw-sub">open</div></div>
+      <div class="bw-tile" data-warn="kpi_werklijst|zonder_datum|>|0"><div class="bw-lbl">Zonder deadline</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="zonder_datum" data-row="0">—</div><div class="bw-sub">datum afspreken</div></div>
+      <div class="bw-tile"><div class="bw-lbl">Open totaal</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="open" data-row="0">—</div><div class="bw-sub">actiepunten</div></div>
+      <div class="bw-tile"><div class="bw-lbl">Eigenaren</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="eigenaren" data-row="0">—</div><div class="bw-sub">met open acties</div></div>
     </div>
     <div class="bw-grid">
-      <div class="bw-card wide" id="werk-mij">
-        <h3>1. Zelf doen</h3>
-        <p class="bw-note">Open acties waarvan de projectveiligheidskundige (mede) eigenaar is. Volgorde: te laat, deze week, hoge prioriteit, daarna op deadline. De kolom ‘Stand’ is de laatst bekende stand.</p>
+      <div class="bw-card wide" id="werk-alle">
+        <h3>Actiepunten op urgentie</h3>
+        <p class="bw-note">Volgorde: te laat, deze week, hoge prioriteit, daarna op deadline. ‘Stand’ is de laatst bekende stand; ‘gereed als’ staat bij nieuwe punten. Bespreken in het LOV-overleg en bij de rondgang.</p>
+        <div class="bw-tools">
+          <input class="bw-search" type="search" placeholder="Zoek op actie of eigenaar" data-for="tb-werk-alle">
+        </div>
         <div class="bw-tw" style="max-height:none">
-          <table class="bw-table" id="tb-werk-mij" data-source="werk_mij" data-row-key="nr">
-            <thead><tr><th data-field="urgentie">Wanneer</th><th data-field="prioriteit">Prioriteit</th><th data-field="nr" class="sec">Nr</th><th data-field="wat">Wat</th><th data-field="stand">Stand</th><th data-field="wie" class="sec">Samen met</th></tr></thead>
+          <table class="bw-table" id="tb-werk-alle" data-source="werk_alle" data-row-key="nr">
+            <thead><tr><th data-field="urgentie">Wanneer</th><th data-field="prioriteit">Prioriteit</th><th data-field="nr" class="sec">Nr</th><th data-field="wat">Wat</th><th data-field="wie">Eigenaar</th><th data-field="stand">Stand</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
-      <div class="bw-card wide" id="werk-anderen">
-        <h3>2. Bewaken bij anderen</h3>
-        <p class="bw-note">Open acties bij uitvoering, projectleiding, QHSE of onderaannemers. Navragen in het LOV-overleg of bij de rondgang.</p>
-        <div class="bw-tw" style="max-height:none">
-          <table class="bw-table" id="tb-werk-anderen" data-source="werk_anderen" data-row-key="nr">
-            <thead><tr><th data-field="urgentie">Wanneer</th><th data-field="prioriteit">Prioriteit</th><th data-field="nr" class="sec">Nr</th><th data-field="wat">Wat</th><th data-field="wie">Eigenaar</th><th data-field="stand">Stand</th></tr></thead>
+      <div class="bw-card wide" id="werk-eigenaar">
+        <h3>Per eigenaar</h3>
+        <p class="bw-note">Aantal open actiepunten per eigenaar of partij. Een gedeelde actie telt bij elke eigenaar mee.</p>
+        <div class="bw-tw">
+          <table class="bw-table" id="tb-werk-eigenaar" data-source="werk_per_eigenaar" data-row-key="eigenaar">
+            <thead><tr><th data-field="eigenaar">Eigenaar</th><th data-field="te_laat">Te laat</th><th data-field="deze_week">Deze week</th><th data-field="hoog">Hoog</th><th data-field="open">Open</th><th data-field="nrs" class="sec">Acties</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -1139,41 +1142,52 @@ dash.calc('deadlines', {
   }
 });
 
-/* Werklijst: zelf doen versus bewaken, op urgentie */
-const IS_MIJ = (a) => /Joey Twigt|projectveiligheidskundige/i.test(String(a.eigenaar || '') + ' ' + String(a.actiehouder || ''));
+/* Werklijst projectteam: alle open acties op urgentie */
 const schoonStand = (t) => String(t || '').replace(/\s*\((?:opgave projectveiligheidskundige|M-Files)[^)]*\)/gi, '').replace(/^Uit M-Files gehaald\s*/i, 'Uit M-Files').trim();
 const werkRij = (a) => {
   const d = a.deadline ? dagenTot(a.deadline) : null;
   const hoog = a.prioriteit === 'Hoog';
   const rang = d != null && d < 0 ? 0 : d != null && d <= 7 ? 1 : hoog && d == null ? 2 : hoog ? 3 : d != null && d <= 30 ? 4 : d != null ? 5 : 6;
   const urgentie = d != null && d < 0 ? (-d) + ' d te laat' : d === 0 ? 'Vandaag' : d != null && d <= 7 ? 'Nog ' + d + ' d' : d != null ? 'Vóór ' + a.deadline.split('-').reverse().join('-') : hoog ? 'Zo snel mogelijk' : 'Geen datum';
-  const wie = (a.eigenaar || a.actiehouder || '').replace(/(^|\s*\/\s*)(Joey Twigt|Projectveiligheidskundige)(?=\s*\/|$)/gi, '').replace(/^\s*\/\s*|\s*\/\s*$/g, '').trim();
-  return { nr: a.nr, rang, dagen: d, urgentie, prioriteit: a.prioriteit || '', wat: a.bevinding, stand: (() => { const m = schoonStand(a.moment); return (!m || /^(Uit M-Files|Toegevoegd|Nog niet opgepakt)$/i.test(m)) ? (m ? m + ' · ' : '') + (a.gereed_als ? 'gereed als: ' + a.gereed_als : '') : m; })(), wie: wie || '—' };
+  const m = schoonStand(a.moment);
+  const stand = (!m || /^(Uit M-Files|Toegevoegd|Nog niet opgepakt)$/i.test(m)) ? (m ? m + ' · ' : '') + (a.gereed_als ? 'gereed als: ' + a.gereed_als : '') : m;
+  return { nr: a.nr, rang, dagen: d, urgentie, prioriteit: a.prioriteit || '', wat: a.bevinding, stand, wie: rol(a.eigenaar || a.actiehouder) || 'onbekend' };
 };
+const ROLLEN = [[/Joey Twigt/g, 'Projectveiligheidskundige'], [/Koen van Heugten/g, 'Bouwplaatscoördinator'], [/Maikel Meeuwissen/g, 'Projectleider realisatie'],
+  [/Bas Timmers|Omgevingscoördinator/g, 'Coördinator omgevingsveiligheid'], [/Anne Ippel/g, 'Projectmanager'], [/\bChris\b/g, 'Projectenbureau'],
+  [/QHSE \(opsteller\)/g, 'QHSE'], [/VORM \(uitvoering\)|\bUitvoerder\b/g, 'Uitvoering'], [/Metaalbouw Vloet/g, 'Vloet'], [/Scalar Verticaal/g, 'Scalar']];
+const rol = (t) => { let x = String(t || ''); ROLLEN.forEach(([re, r]) => { x = x.replace(re, r); }); return [...new Set(x.split(/\s*\/\s*/).filter(Boolean))].join(' / '); };
 const werkSort = (x, y) => x.rang - y.rang || (x.dagen ?? 9999) - (y.dagen ?? 9999) || String(x.nr).localeCompare(String(y.nr), 'nl', { numeric: true });
 
-dash.calc('werk_mij', {
-  title: 'Werklijst: zelf doen',
-  description: 'Open acties waarvan de projectveiligheidskundige (mede) eigenaar of actiehouder is, op urgentie: te laat, deze week, hoog zonder datum, hoog, binnen 30 dagen, later.',
+dash.calc('werk_alle', {
+  title: 'Werklijst projectteam',
+  description: 'Alle open acties op urgentie: te laat, deze week, hoog zonder datum, hoog, binnen 30 dagen, later, zonder datum.',
   inputs: ['acties'],
-  fn: (acties) => acties.filter((a) => a.status !== 'Gesloten' && IS_MIJ(a)).map(werkRij).sort(werkSort)
+  fn: (acties) => acties.filter((a) => a.status !== 'Gesloten').map(werkRij).sort(werkSort)
 });
 
-dash.calc('werk_anderen', {
-  title: 'Werklijst: bewaken bij anderen',
-  description: 'Open acties bij andere eigenaren, op urgentie.',
-  inputs: ['acties'],
-  fn: (acties) => acties.filter((a) => a.status !== 'Gesloten' && !IS_MIJ(a)).map(werkRij).sort(werkSort)
+dash.calc('werk_per_eigenaar', {
+  title: 'Open acties per eigenaar',
+  description: 'Per eigenaar of partij het aantal open acties, te laat, deze week en hoog; een gedeelde actie (a / b) telt bij beide.',
+  inputs: ['werk_alle'],
+  fn: (werk_alle) => {
+    const m = new Map();
+    werk_alle.forEach((r) => String(r.wie).split(/\s*\/\s*/).filter(Boolean).forEach((e) => {
+      const o = m.get(e) || { eigenaar: e, open: 0, te_laat: 0, deze_week: 0, hoog: 0, nrs: [] };
+      o.open++; if (r.rang === 0) o.te_laat++; if (r.rang === 1) o.deze_week++; if (r.prioriteit === 'Hoog') o.hoog++; o.nrs.push(r.nr); m.set(e, o);
+    }));
+    return [...m.values()].map((o) => ({ ...o, nrs: o.nrs.join(', ') })).sort((a, b) => b.te_laat - a.te_laat || b.hoog - a.hoog || b.open - a.open);
+  }
 });
 
 dash.calc('kpi_werklijst', {
   title: 'Werklijst kerngetallen',
-  description: 'Aantal open acties bij de projectveiligheidskundige en bij anderen: te laat, deze week, hoge prioriteit.',
-  inputs: ['werk_mij', 'werk_anderen'],
-  fn: (mij, and) => [{
-    mij_open: mij.length, mij_laat: mij.filter((r) => r.rang === 0).length, mij_week: mij.filter((r) => r.rang === 1).length,
-    mij_hoog: mij.filter((r) => r.prioriteit === 'Hoog').length, mij_urgent: mij.filter((r) => r.rang <= 2).length,
-    anderen_open: and.length, anderen_laat: and.filter((r) => r.rang === 0).length
+  description: 'Aantal open acties: te laat, deze week, hoge prioriteit, zonder deadline, totaal en aantal eigenaren.',
+  inputs: ['werk_alle', 'werk_per_eigenaar'],
+  fn: (werk_alle, werk_per_eigenaar) => [{
+    open: werk_alle.length, te_laat: werk_alle.filter((r) => r.rang === 0).length, deze_week: werk_alle.filter((r) => r.rang === 1).length,
+    hoog: werk_alle.filter((r) => r.prioriteit === 'Hoog').length, zonder_datum: werk_alle.filter((r) => r.dagen == null).length,
+    urgent: werk_alle.filter((r) => r.rang <= 1).length, eigenaren: werk_per_eigenaar.length
   }]
 });
 
@@ -2323,12 +2337,12 @@ const COLS = {
   werklijst: [
     { k: 'urgentie', rag: true, tone: (v, r) => r.rang === 0 ? 'bad' : r.rang <= 2 ? 'warn' : r.rang <= 4 ? 'info' : 'mute', sortv: (r) => r.rang * 100000 + (r.dagen ?? 9999), num: true },
     { k: 'prioriteit', rag: true, tone: (v) => v === 'Hoog' ? 'bad' : v === 'Middel' ? 'warn' : 'mute', sortv: (r) => ({ Hoog: 0, Middel: 1, Laag: 2 }[r.prioriteit] ?? 3), num: true },
-    { k: 'nr', sec: true }, { k: 'wat', wrap: true }, { k: 'stand', wrap: true }, { k: 'wie', sec: true }
+    { k: 'nr', sec: true }, { k: 'wat', wrap: true }, { k: 'wie' }, { k: 'stand', wrap: true, sec: true }
   ],
-  werklijst2: [
-    { k: 'urgentie', rag: true, tone: (v, r) => r.rang === 0 ? 'bad' : r.rang <= 2 ? 'warn' : r.rang <= 4 ? 'info' : 'mute', sortv: (r) => r.rang * 100000 + (r.dagen ?? 9999), num: true },
-    { k: 'prioriteit', rag: true, tone: (v) => v === 'Hoog' ? 'bad' : v === 'Middel' ? 'warn' : 'mute', sortv: (r) => ({ Hoog: 0, Middel: 1, Laag: 2 }[r.prioriteit] ?? 3), num: true },
-    { k: 'nr', sec: true }, { k: 'wat', wrap: true }, { k: 'wie' }, { k: 'stand', wrap: true }
+  werkeig: [
+    { k: 'eigenaar' },
+    { k: 'te_laat', num: true, tone: (v) => v > 0 ? 'bad' : 'mute' }, { k: 'deze_week', num: true, tone: (v) => v > 0 ? 'warn' : 'mute' },
+    { k: 'hoog', num: true }, { k: 'open', num: true }, { k: 'nrs', sec: true, wrap: true }
   ],
   deadlines: [
     { k: 'deadline', fmt: fDate, date: true },
@@ -2365,8 +2379,8 @@ const ATTN = (r) => ['Verlopen', 'Ontbreekt'].includes(r.vca_status) || ['Verlop
 
 function drawTables() {
   drawTable('tb-leidend', ['leidend_overzicht'], rowsOf('leidend_overzicht'), COLS.leidend, { key: 'id' });
-  drawTable('tb-werk-mij', ['werk_mij'], rowsOf('werk_mij'), COLS.werklijst, { key: 'nr', sort: 'urgentie', dir: 1 });
-  drawTable('tb-werk-anderen', ['werk_anderen'], rowsOf('werk_anderen'), COLS.werklijst2, { key: 'nr', sort: 'urgentie', dir: 1 });
+  drawTable('tb-werk-alle', ['werk_alle'], rowsOf('werk_alle'), COLS.werklijst, { key: 'nr', sort: 'urgentie', dir: 1 });
+  drawTable('tb-werk-eigenaar', ['werk_per_eigenaar'], rowsOf('werk_per_eigenaar'), COLS.werkeig, { key: 'eigenaar' });
   drawTable('tb-deadlines', ['deadlines'], rowsOf('deadlines'), COLS.deadlines, { key: 'id', sort: 'dagen', dir: 1 });
   { const c = document.getElementById('deadlines'); if (c) c.hidden = state('deadlines') === 'ok' && !rowsOf('deadlines').length; }
   drawTable('tb-aandacht', ['aandachtspunten'], rowsOf('aandachtspunten'), COLS.aandacht, { key: 'id', sort: 'prioriteit', dir: 1 });
