@@ -72,7 +72,8 @@
   </header>
 
   <nav class="bw-tabs" role="tablist" id="tabs">
-    <button class="bw-tab" role="tab" data-tab="overzicht" aria-selected="true">Overzicht</button>
+    <button class="bw-tab" role="tab" data-tab="werklijst" aria-selected="true">Werklijst <span class="n" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_urgent" data-row="0">—</span></button>
+    <button class="bw-tab" role="tab" data-tab="overzicht" aria-selected="false">Overzicht</button>
     <button class="bw-tab" role="tab" data-tab="inspecties" aria-selected="false">Inspecties</button>
     <button class="bw-tab" role="tab" data-tab="meldingen" aria-selected="false">Meldingen</button>
     <button class="bw-tab" role="tab" data-tab="acties" aria-selected="false">Acties <span class="n" data-kpi data-fmt="int" data-source="kpi_acties" data-field="hoog_open" data-row="0">—</span></button>
@@ -85,8 +86,43 @@
     <button class="bw-present-btn" id="present-btn" type="button" aria-pressed="false" title="Volledig scherm voor beamer of tv; pijltjestoetsen wisselen van tabblad, Esc stopt"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12v8H2z M6 14h4 M8 11v3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Presentatie</span></button>
   </nav>
 
+  <!-- ================= WERKLIJST ================= -->
+  <section class="bw-page" id="werklijst" role="tabpanel">
+    <h2 class="bw-h2">Werklijst projectveiligheidskundige <small>wat moet ik doen, wat bewaak ik bij anderen</small></h2>
+    <div class="bw-tiles six">
+      <div class="bw-tile hero" data-alert="kpi_werklijst|mij_laat|>|0"><div class="bw-lbl">Bij mij te laat</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_laat" data-row="0">—</div><div class="bw-sub">deadline verstreken</div></div>
+      <div class="bw-tile" data-alert="kpi_werklijst|mij_hoog|>|0"><div class="bw-lbl">Bij mij hoog</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_hoog" data-row="0">—</div><div class="bw-sub">hoge prioriteit open</div></div>
+      <div class="bw-tile" data-warn="kpi_werklijst|mij_week|>|0"><div class="bw-lbl">Bij mij deze week</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_week" data-row="0">—</div><div class="bw-sub">deadline binnen 7 dagen</div></div>
+      <div class="bw-tile"><div class="bw-lbl">Bij mij totaal</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="mij_open" data-row="0">—</div><div class="bw-sub">open acties</div></div>
+      <div class="bw-tile" data-alert="kpi_werklijst|anderen_laat|>|0"><div class="bw-lbl">Bij anderen te laat</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="anderen_laat" data-row="0">—</div><div class="bw-sub">navragen</div></div>
+      <div class="bw-tile"><div class="bw-lbl">Bij anderen totaal</div><div class="bw-val" data-kpi data-fmt="int" data-source="kpi_werklijst" data-field="anderen_open" data-row="0">—</div><div class="bw-sub">bewaken</div></div>
+    </div>
+    <div class="bw-grid">
+      <div class="bw-card wide" id="werk-mij">
+        <h3>1. Zelf doen</h3>
+        <p class="bw-note">Open acties waarvan de projectveiligheidskundige (mede) eigenaar is. Volgorde: te laat, deze week, hoge prioriteit, daarna op deadline. De kolom ‘Stand’ is de laatst bekende stand.</p>
+        <div class="bw-tw" style="max-height:none">
+          <table class="bw-table" id="tb-werk-mij" data-source="werk_mij" data-row-key="nr">
+            <thead><tr><th data-field="urgentie">Wanneer</th><th data-field="prioriteit">Prioriteit</th><th data-field="nr" class="sec">Nr</th><th data-field="wat">Wat</th><th data-field="stand">Stand</th><th data-field="wie" class="sec">Samen met</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bw-card wide" id="werk-anderen">
+        <h3>2. Bewaken bij anderen</h3>
+        <p class="bw-note">Open acties bij uitvoering, projectleiding, QHSE of onderaannemers. Navragen in het LOV-overleg of bij de rondgang.</p>
+        <div class="bw-tw" style="max-height:none">
+          <table class="bw-table" id="tb-werk-anderen" data-source="werk_anderen" data-row-key="nr">
+            <thead><tr><th data-field="urgentie">Wanneer</th><th data-field="prioriteit">Prioriteit</th><th data-field="nr" class="sec">Nr</th><th data-field="wat">Wat</th><th data-field="wie">Eigenaar</th><th data-field="stand">Stand</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ================= OVERZICHT ================= -->
-  <section class="bw-page" id="overzicht" role="tabpanel">
+  <section class="bw-page" id="overzicht" role="tabpanel" hidden>
     <div class="bw-grid kern">
       <div class="bw-card" id="doelen">
         <h3>Doelen 2026 <span class="bw-src">VCA · VORM-normen</span></h3>
@@ -1101,6 +1137,44 @@ dash.calc('deadlines', {
     return acties.filter((a) => a.status !== 'Gesloten' && a.deadline).map((a) => rij(a.nr, 'Actie', a.bevinding, a.eigenaar, a.deadline))
       .filter((r) => r.dagen <= 30).sort((a, b) => a.deadline.localeCompare(b.deadline));
   }
+});
+
+/* Werklijst: zelf doen versus bewaken, op urgentie */
+const IS_MIJ = (a) => /Joey Twigt|projectveiligheidskundige/i.test(String(a.eigenaar || '') + ' ' + String(a.actiehouder || ''));
+const schoonStand = (t) => String(t || '').replace(/\s*\((?:opgave projectveiligheidskundige|M-Files)[^)]*\)/gi, '').replace(/^Uit M-Files gehaald\s*/i, 'Uit M-Files').trim();
+const werkRij = (a) => {
+  const d = a.deadline ? dagenTot(a.deadline) : null;
+  const hoog = a.prioriteit === 'Hoog';
+  const rang = d != null && d < 0 ? 0 : d != null && d <= 7 ? 1 : hoog && d == null ? 2 : hoog ? 3 : d != null && d <= 30 ? 4 : d != null ? 5 : 6;
+  const urgentie = d != null && d < 0 ? (-d) + ' d te laat' : d === 0 ? 'Vandaag' : d != null && d <= 7 ? 'Nog ' + d + ' d' : d != null ? 'Vóór ' + a.deadline.split('-').reverse().join('-') : hoog ? 'Zo snel mogelijk' : 'Geen datum';
+  const wie = (a.eigenaar || a.actiehouder || '').replace(/(^|\s*\/\s*)(Joey Twigt|Projectveiligheidskundige)(?=\s*\/|$)/gi, '').replace(/^\s*\/\s*|\s*\/\s*$/g, '').trim();
+  return { nr: a.nr, rang, dagen: d, urgentie, prioriteit: a.prioriteit || '', wat: a.bevinding, stand: (() => { const m = schoonStand(a.moment); return (!m || /^(Uit M-Files|Toegevoegd|Nog niet opgepakt)$/i.test(m)) ? (m ? m + ' · ' : '') + (a.gereed_als ? 'gereed als: ' + a.gereed_als : '') : m; })(), wie: wie || '—' };
+};
+const werkSort = (x, y) => x.rang - y.rang || (x.dagen ?? 9999) - (y.dagen ?? 9999) || String(x.nr).localeCompare(String(y.nr), 'nl', { numeric: true });
+
+dash.calc('werk_mij', {
+  title: 'Werklijst: zelf doen',
+  description: 'Open acties waarvan de projectveiligheidskundige (mede) eigenaar of actiehouder is, op urgentie: te laat, deze week, hoog zonder datum, hoog, binnen 30 dagen, later.',
+  inputs: ['acties'],
+  fn: (acties) => acties.filter((a) => a.status !== 'Gesloten' && IS_MIJ(a)).map(werkRij).sort(werkSort)
+});
+
+dash.calc('werk_anderen', {
+  title: 'Werklijst: bewaken bij anderen',
+  description: 'Open acties bij andere eigenaren, op urgentie.',
+  inputs: ['acties'],
+  fn: (acties) => acties.filter((a) => a.status !== 'Gesloten' && !IS_MIJ(a)).map(werkRij).sort(werkSort)
+});
+
+dash.calc('kpi_werklijst', {
+  title: 'Werklijst kerngetallen',
+  description: 'Aantal open acties bij de projectveiligheidskundige en bij anderen: te laat, deze week, hoge prioriteit.',
+  inputs: ['werk_mij', 'werk_anderen'],
+  fn: (mij, and) => [{
+    mij_open: mij.length, mij_laat: mij.filter((r) => r.rang === 0).length, mij_week: mij.filter((r) => r.rang === 1).length,
+    mij_hoog: mij.filter((r) => r.prioriteit === 'Hoog').length, mij_urgent: mij.filter((r) => r.rang <= 2).length,
+    anderen_open: and.length, anderen_laat: and.filter((r) => r.rang === 0).length
+  }]
 });
 
 dash.calc('kpi_acties', {
@@ -2246,6 +2320,16 @@ const COLS = {
     { k: 'kpi' }, { k: 'doel' }, { k: 'stand' },
     { k: 'status', tone: (v) => ({ 'Op koers': 'ok', Aandacht: 'warn', 'Onder doel': 'bad' }[v] || 'mute') }
   ],
+  werklijst: [
+    { k: 'urgentie', rag: true, tone: (v, r) => r.rang === 0 ? 'bad' : r.rang <= 2 ? 'warn' : r.rang <= 4 ? 'info' : 'mute', sortv: (r) => r.rang * 100000 + (r.dagen ?? 9999), num: true },
+    { k: 'prioriteit', rag: true, tone: (v) => v === 'Hoog' ? 'bad' : v === 'Middel' ? 'warn' : 'mute', sortv: (r) => ({ Hoog: 0, Middel: 1, Laag: 2 }[r.prioriteit] ?? 3), num: true },
+    { k: 'nr', sec: true }, { k: 'wat', wrap: true }, { k: 'stand', wrap: true }, { k: 'wie', sec: true }
+  ],
+  werklijst2: [
+    { k: 'urgentie', rag: true, tone: (v, r) => r.rang === 0 ? 'bad' : r.rang <= 2 ? 'warn' : r.rang <= 4 ? 'info' : 'mute', sortv: (r) => r.rang * 100000 + (r.dagen ?? 9999), num: true },
+    { k: 'prioriteit', rag: true, tone: (v) => v === 'Hoog' ? 'bad' : v === 'Middel' ? 'warn' : 'mute', sortv: (r) => ({ Hoog: 0, Middel: 1, Laag: 2 }[r.prioriteit] ?? 3), num: true },
+    { k: 'nr', sec: true }, { k: 'wat', wrap: true }, { k: 'wie' }, { k: 'stand', wrap: true }
+  ],
   deadlines: [
     { k: 'deadline', fmt: fDate, date: true },
     { k: 'dagen', num: true, rag: true, tone: (v) => v < 0 ? 'bad' : v <= 7 ? 'warn' : 'info', fmt: (v) => v < 0 ? -v + ' d te laat' : v === 0 ? 'Vandaag' : 'Nog ' + v + ' d' },
@@ -2281,6 +2365,8 @@ const ATTN = (r) => ['Verlopen', 'Ontbreekt'].includes(r.vca_status) || ['Verlop
 
 function drawTables() {
   drawTable('tb-leidend', ['leidend_overzicht'], rowsOf('leidend_overzicht'), COLS.leidend, { key: 'id' });
+  drawTable('tb-werk-mij', ['werk_mij'], rowsOf('werk_mij'), COLS.werklijst, { key: 'nr', sort: 'urgentie', dir: 1 });
+  drawTable('tb-werk-anderen', ['werk_anderen'], rowsOf('werk_anderen'), COLS.werklijst2, { key: 'nr', sort: 'urgentie', dir: 1 });
   drawTable('tb-deadlines', ['deadlines'], rowsOf('deadlines'), COLS.deadlines, { key: 'id', sort: 'dagen', dir: 1 });
   { const c = document.getElementById('deadlines'); if (c) c.hidden = state('deadlines') === 'ok' && !rowsOf('deadlines').length; }
   drawTable('tb-aandacht', ['aandachtspunten'], rowsOf('aandachtspunten'), COLS.aandacht, { key: 'id', sort: 'prioriteit', dir: 1 });
