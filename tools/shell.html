@@ -32,9 +32,9 @@ body.locked #dash-root,body.locked .appbar{visibility:hidden}
 body:has(.bw-present) .appbar{display:none}
 body:has(.bw-present) #dash-root{padding:0}
 #lock{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;
-background:radial-gradient(120% 80% at 50% 0%,#0e2a4d 0%,#0b0f14 60%)}
+background:linear-gradient(180deg,rgba(0,40,82,.55) 0%,rgba(11,15,20,.80) 60%,rgba(11,15,20,.92) 100%),url("icons/boogiewood.jpg") center 30%/cover no-repeat,#0b0f14}
 body.locked #lock{display:flex}
-.lk{width:100%;max-width:360px;background:#141a21;border:1px solid #26303b;border-radius:14px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lk{width:100%;max-width:360px;background:rgba(20,26,33,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid #26303b;border-radius:14px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .lk .tag{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#00acec;font-weight:600}
 .lk .tag:before{content:"";width:18px;height:2px;background:#00acec}
 .lk h1{margin:10px 0 4px;font-size:22px;line-height:1.25;font-weight:700}

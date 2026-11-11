@@ -1,6 +1,6 @@
 // Offline-cache: altijd eerst het netwerk, bij geen verbinding de laatst bewaarde versie.
-const CACHE = 'bw-v1';
-const SHELL = ['./', 'index.html', 'd3.min.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'data/app.enc.json'];
+const CACHE = 'bw-v2';
+const SHELL = ['./', 'index.html', 'd3.min.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/boogiewood.jpg', 'data/app.enc.json'];
 self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {})); });
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', (e) => {
