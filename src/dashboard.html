@@ -34,7 +34,7 @@
         <div class="bw-mon-row" data-goto="bouwplaats#bouwpas" role="link" tabindex="0" title="Naar toegang, VCA en instructie" data-alert="kpi_bezetting|instructie_pct|<|0.9" data-warn="kpi_bezetting|instructie_pct|<|1" data-good="kpi_bezetting|instructie_pct|=|1">
           <div class="l"><i></i>Poortinstructie gevolgd</div><div class="v"><b data-kpi data-fmt="pct" data-source="kpi_bezetting" data-field="instructie_pct" data-row="0">—</b></div>
           <div class="bar" data-bar="kpi_bezetting|instructie_pct|1"><i></i></div>
-          <div class="s"><span data-kpi data-fmt="int" data-source="kpi_bezetting" data-field="instructie_verlopen" data-row="0">—</span> verlopen · <span data-kpi data-fmt="int" data-source="kpi_bezetting" data-field="instructie_verloopt_30d" data-row="0">—</span> verloopt binnen 30 dagen</div>
+          <div class="s">Eenmalig, blijft geldig · <span data-kpi data-fmt="int" data-source="kpi_bezetting" data-field="instructie_niet_uitgenodigd" data-row="0">—</span> nog niet uitgenodigd</div>
         </div>
       </div>
       <div class="bw-mon-sec">
@@ -904,9 +904,9 @@ dash.calc('kpi_bezetting', {
       vca_verloopt: bp_vca.filter((r) => r.vca_status === 'Verloopt bijna').length,
       vol: bp_vca.filter((r) => r.vca_type === 'VOL-VCA').length,
       zzp_pct: (k.zelfstandig + k.loondienst) ? k.zelfstandig / (k.zelfstandig + k.loondienst) : 0,
-      instructie_pct: (k.instructie_geslaagd + k.instructie_verlopen + k.instructie_niet_uitgenodigd) ? k.instructie_geslaagd / (k.instructie_geslaagd + k.instructie_verlopen + k.instructie_niet_uitgenodigd) : 0,
-      instructie_verlopen: k.instructie_verlopen,
-      instructie_verloopt_30d: k.instructie_verloopt_30d,
+      // Poortinstructie is eenmalig en blijft geldig: 'verlopen' in Bouwpas telt als gevolgd.
+      instructie_pct: (k.instructie_geslaagd + k.instructie_verlopen + k.instructie_niet_uitgenodigd) ? (k.instructie_geslaagd + k.instructie_verlopen) / (k.instructie_geslaagd + k.instructie_verlopen + k.instructie_niet_uitgenodigd) : 0,
+      instructie_niet_uitgenodigd: k.instructie_niet_uitgenodigd,
       passen_actief: k.passen_actief,
       passen_geprint: k.passen_geprint,
       nationaliteiten: k.nationaliteiten,
@@ -1728,8 +1728,7 @@ dash.calc('mensen_status', {
     const overig = bp_vca.filter((r) => !bekend.includes(r.vca_status)).length;
     if (overig) rows.push({ groep: 'VCA', status: 'Overig', aantal: overig, toon: 'mute' });
     rows.push(
-      { groep: 'Poortinstructie', status: 'Gevolgd', aantal: Number(k.instructie_geslaagd || 0), toon: 'ok' },
-      { groep: 'Poortinstructie', status: 'Verlopen', aantal: Number(k.instructie_verlopen || 0), toon: 'bad' },
+      { groep: 'Poortinstructie', status: 'Gevolgd', aantal: Number(k.instructie_geslaagd || 0) + Number(k.instructie_verlopen || 0), toon: 'ok' },
       { groep: 'Poortinstructie', status: 'Niet uitgenodigd', aantal: Number(k.instructie_niet_uitgenodigd || 0), toon: 'warn' }
     );
     return rows;
