@@ -2331,7 +2331,8 @@ dash.calc('aandachtspunten', {
     if (k && k.n && k.tekort > 0) add('k4y', k.reeks_onder >= 2 ? 'Hoog' : 'Middel', 'Knowledge4You', 'Externe inspectie onder norm: ' + String(k.laatste).replace('.', ',') + '%', 'Norm VORM Bouw ' + String(k.norm).replace('.', ',') + '%. ' + (k.reeks_onder >= 2 ? k.reeks_onder + ' metingen op rij onder norm' : 'Laatste meting onder norm') + '; gemiddeld 2026 ' + String(k.gemiddeld).replace('.', ',') + '%.');
     const eis = Object.fromEntries(vca_eisen.map((e) => [e.id, e]));
     vca_toets.filter((r) => r.status === 'Niet voldaan' && eis[r.id].meting !== 'keuring').forEach((r) => add('vca-' + r.id, 'Hoog', eis[r.id].vraag === '—' ? eis[r.id].wet : 'VCA ' + eis[r.id].vraag, eis[r.id].eis, r.toelichting));
-    acties.filter((a) => a.status !== 'Gesloten' && a.prioriteit === 'Hoog' && !a.deadline).forEach((a) => add('act-' + a.nr, 'Hoog', 'Actie ' + a.nr, a.bevinding, 'Eigenaar: ' + (a.eigenaar || a.actiehouder || 'onbekend')));
+    // Alle open acties (behalve keuringen: die staan samen onder 'Keuring verlopen'), met hun eigen prioriteit.
+    acties.filter((a) => a.status !== 'Gesloten' && !/keuring/i.test(a.bevinding)).forEach((a) => add('act-' + a.nr, a.prioriteit === 'Hoog' ? 'Hoog' : 'Middel', 'Actie ' + a.nr, a.bevinding, (a.moment ? a.moment + ' · ' : '') + 'Eigenaar: ' + (a.eigenaar_rol || a.eigenaar || a.actiehouder || 'onbekend')));
     meldingen.filter((m) => /bijna/i.test(m.type) && dagen(m.datum) >= 0 && dagen(m.datum) <= 30).forEach((m) => add('bo-' + m.id, 'Hoog', 'Bijna-ongeval ' + m.id, (m.hoofdonderwerp || 'Bijna-ongeval') + (m.bedrijf ? ' · ' + m.bedrijf : ''), String(m.omschrijving || '').length > 140 ? String(m.omschrijving).slice(0, 140) + '…' : String(m.omschrijving || '')));
     meldingen.filter((m) => m.type === 'Onveilige situatie / handeling' && dagen(m.datum) >= 0 && dagen(m.datum) <= 30).forEach((m) => add('mld-' + m.id, 'Middel', 'Melding ' + m.id, m.hoofdonderwerp + (m.bedrijf ? ' · ' + m.bedrijf : ''), m.omschrijving.length > 140 ? m.omschrijving.slice(0, 140) + '…' : m.omschrijving));
     vgdocs.filter((d) => d.status === 'Ontbreekt').forEach((d) => add('doc-' + d.id, 'Hoog', 'V&G-document', 'Ontbreekt: ' + d.document, d.partij + (d.opmerking ? ' · ' + d.opmerking : '')));
@@ -2347,7 +2348,7 @@ dash.calc('aandachtspunten', {
     if (zd.length) add('mat-datum', 'Middel', 'Materieel', 'Keuringsdata aanleveren (' + zd.length + ')', 'Gecontroleerd en geldig; vervaldatum nog vastleggen: ' + zd.map((m) => m.id).join(', '));
     const nlDatum = (iso) => iso ? iso.split('-').reverse().join('-') : 'onbekend';
     const kv = keuringen_status.filter((k) => k.keur_status === 'Verlopen');
-    if (kv.length) add('keur-verlopen', 'Hoog', 'Keuring', 'Keuring verlopen (' + kv.length + ')', kv.map((k) => k.materieel.replace(/\.+$/, '') + ' (vóór ' + nlDatum(k.volgende) + ')').join('; ') + '. Keuren of van de bouw halen.');
+    if (kv.length) add('keur-verlopen', 'Middel', 'Keuring', 'Keuring verlopen (' + kv.length + ')', kv.map((k) => k.materieel.replace(/\.+$/, '') + ' (vóór ' + nlDatum(k.volgende) + ')').join('; ') + '. Keuren of van de bouw halen.');
     const k30 = keuringen_status.filter((k) => k.keur_status === 'Verloopt');
     if (k30.length) add('keur-30', 'Middel', 'Keuring', 'Keuring binnen 30 dagen (' + k30.length + ')', [...new Set(k30.map((k) => k.materieel.replace(/\.+$/, '') + ' vóór ' + nlDatum(k.volgende)))].map((t) => { const n = k30.filter((k) => k.materieel.replace(/\.+$/, '') + ' vóór ' + nlDatum(k.volgende) === t).length; return (n > 1 ? n + '× ' : '') + t; }).join('; '));
     const afgehandeld = new Set(project[0].aandacht_afgehandeld || []);
