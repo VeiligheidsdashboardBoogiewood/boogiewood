@@ -1,4 +1,4 @@
-"""Haalt de laatste KNMI-meting van station Voorschoten op en schrijft data/wind.json.
+"""Haalt de laatste KNMI-meting van station Voorschoten op (wind, temperatuur en gevoelstemperatuur) en schrijft data/wind.json.
 Draait elk uur via GitHub Actions (.github/workflows/wind.yml)."""
 import html, json, re, sys, urllib.request
 from datetime import datetime, timezone
@@ -9,6 +9,12 @@ MAANDEN = {m: i for i, m in enumerate(["januari", "februari", "maart", "april", 
 
 def tekst(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s))).strip()
+
+def getal(s):
+    try:
+        return float(s.replace(",", ".").replace("\u2212", "-"))
+    except (ValueError, AttributeError):
+        return None
 
 def main(uit):
     req = urllib.request.Request(URL + "?v=" + datetime.now(timezone.utc).strftime("%Y%m%d%H%M"), headers={"User-Agent": "Mozilla/5.0 (veiligheidsdashboard)"})
@@ -33,6 +39,7 @@ def main(uit):
         "tijd_utc": lokaal.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:00Z"),
         "richting": richting, "wind_10m_ms": float(kol("wind (m/s)").replace(",", ".")),
         "bft_10m": int(bft), "stoot_10m_kmh": float(kol("windstoot").replace(",", ".")),
+        "temp_c": getal(kol("temp")), "gevoel_c": getal(kol("chill")),
     }]
     if out[0]["stoot_10m_kmh"].is_integer():
         out[0]["stoot_10m_kmh"] = int(out[0]["stoot_10m_kmh"])
